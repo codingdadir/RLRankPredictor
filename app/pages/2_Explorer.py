@@ -38,6 +38,91 @@ RANK_NAMES = {
     21: "Grand Champion 3",
 }
 
+STAT_NAMES = {
+    "core_shots": "Shots",
+    "core_goals": "Goals",
+    "core_saves": "Saves",
+    "core_assists": "Assists",
+    "core_score": "Score",
+    "core_shooting_percentage": "Shooting %",
+    "core_mvp": "MVP",
+    "boost_bpm": "Boost Used Per Min",
+    "boost_bcpm": "Boost Collected Per Min",
+    "boost_avg_amount": "Avg Boost Amount",
+    "boost_amount_collected": "Boost Collected",
+    "boost_amount_stolen": "Boost Stolen",
+    "boost_amount_collected_big": "Big Pad Collected",
+    "boost_amount_collected_small": "Small Pad Collected",
+    "boost_amount_stolen_big": "Big Pad Stolen",
+    "boost_amount_stolen_small": "Small Pad Stolen",
+    "boost_count_collected_big": "Big Pad Pickups",
+    "boost_count_collected_small": "Small Pad Pickups",
+    "boost_count_stolen_big": "Big Pad Steals",
+    "boost_count_stolen_small": "Small Pad Steals",
+    "boost_amount_overfill": "Boost Overfill",
+    "boost_amount_overfill_stolen": "Boost Overfill Stolen",
+    "boost_amount_used_while_supersonic": "Boost Used Supersonic",
+    "boost_time_zero_boost": "Time at Zero Boost",
+    "boost_percent_zero_boost": "% Time at Zero Boost",
+    "boost_time_full_boost": "Time at Full Boost",
+    "boost_percent_full_boost": "% Time at Full Boost",
+    "boost_time_boost_0_25": "Time 0-25% Boost",
+    "boost_time_boost_25_50": "Time 25-50% Boost",
+    "boost_time_boost_50_75": "Time 50-75% Boost",
+    "boost_time_boost_75_100": "Time 75-100% Boost",
+    "movement_avg_speed": "Avg Speed",
+    "movement_total_distance": "Total Distance",
+    "movement_time_supersonic_speed": "Time at Supersonic",
+    "movement_time_boost_speed": "Time at Boost Speed",
+    "movement_time_slow_speed": "Time at Slow Speed",
+    "movement_time_ground": "Time on Ground",
+    "movement_time_low_air": "Time Low in Air",
+    "movement_time_high_air": "Time High in Air",
+    "movement_time_powerslide": "Time Powersliding",
+    "movement_count_powerslide": "Powerslide Count",
+    "movement_avg_powerslide_duration": "Avg Powerslide Duration",
+    "movement_avg_speed_percentage": "Avg Speed %",
+    "movement_percent_slow_speed": "% Time Slow",
+    "movement_percent_boost_speed": "% Time Boost Speed",
+    "movement_percent_supersonic_speed": "% Time Supersonic",
+    "movement_percent_ground": "% Time Grounded",
+    "movement_percent_low_air": "% Time Low Air",
+    "movement_percent_high_air": "% Time High Air",
+    "positioning_avg_distance_to_ball": "Avg Distance to Ball",
+    "positioning_avg_distance_to_ball_possession": "Avg Distance to Ball (Possession)",
+    "positioning_avg_distance_to_ball_no_possession": "Avg Distance to Ball (No Possession)",
+    "positioning_avg_distance_to_mates": "Avg Distance to Teammates",
+    "positioning_time_defensive_third": "Time in Defensive Third",
+    "positioning_time_neutral_third": "Time in Neutral Third",
+    "positioning_time_offensive_third": "Time in Offensive Third",
+    "positioning_time_defensive_half": "Time in Defensive Half",
+    "positioning_time_offensive_half": "Time in Offensive Half",
+    "positioning_time_behind_ball": "Time Behind Ball",
+    "positioning_time_infront_ball": "Time Ahead of Ball",
+    "positioning_percent_defensive_third": "% Time Defensive Third",
+    "positioning_percent_offensive_third": "% Time Offensive Third",
+    "positioning_percent_neutral_third": "% Time Neutral Third",
+    "positioning_percent_defensive_half": "% Time Defensive Half",
+    "positioning_percent_offensive_half": "% Time Offensive Half",
+    "positioning_percent_behind_ball": "% Time Behind Ball",
+    "positioning_percent_infront_ball": "% Time Ahead of Ball",
+    "demo_inflicted": "Demos Inflicted",
+    "demo_taken": "Demos Taken",
+    "core_shots_against": "Shots Against",
+    "core_goals_against": "Goals Against",
+    "boost_percent_boost_0_25": "% Time 0-25% Boost",
+    "boost_percent_boost_25_50": "% Time 25-50% Boost",
+    "boost_percent_boost_50_75": "% Time 50-75% Boost",
+    "boost_percent_boost_75_100": "% Time 75-100% Boost",
+    "positioning_time_most_back": "Time as Last Defender",
+    "positioning_time_most_forward": "Time as Most Forward",
+    "positioning_time_closest_to_ball": "Time Closest to Ball",
+    "positioning_time_farthest_from_ball": "Time Farthest from Ball",
+    "positioning_percent_most_back": "% Time as Last Defender",
+    "positioning_percent_most_forward": "% Time as Most Forward",
+    "positioning_percent_closest_to_ball": "% Time Closest to Ball",
+    "positioning_percent_farthest_from_ball": "% Time Farthest from Ball",
+}
 
 @st.cache_data
 def load_data():
@@ -139,6 +224,9 @@ correlation_summary = pd.DataFrame({
 
 top_correlations = correlation_summary.head(20)
 
+top_correlations = top_correlations.copy()
+top_correlations["stat"] = top_correlations["stat"].map(lambda x: STAT_NAMES.get(x, x))
+
 st.dataframe(
     top_correlations,
     use_container_width=True,
@@ -184,6 +272,7 @@ available_defaults = [
 selected_stat = st.selectbox(
     "Choose a stat to explore",
     options=numeric_columns,
+    format_func=lambda x: STAT_NAMES.get(x, x),
     index=numeric_columns.index(available_defaults[0]) if available_defaults else 0
 )
 
@@ -208,9 +297,9 @@ st.line_chart(
     rank_means,
     x="rank_name",
     y=selected_stat,
+    y_label=STAT_NAMES.get(selected_stat, selected_stat),
     use_container_width=True
 )
-
 st.divider()
 
 

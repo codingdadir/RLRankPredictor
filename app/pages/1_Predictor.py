@@ -63,7 +63,7 @@ def replay_not_found():
     st.write("Also make sure the replay is public on Ballchasing, and the gamemode is Ranked Standard.")
 
 
-replay_url = st.text_input("Enter BallChasing URL or Replay ID:", value="https://ballchasing.com/replay/7263fbda-ee32-4d5c-b892-bf712d69d744", placeholder="https://ballchasing.com/replay/xxx...")
+replay_url = st.text_input("Enter BallChasing URL or Replay ID:", placeholder="https://ballchasing.com/replay/xxx...")
 
 _, c2, _ = st.columns([1, 0.2, 1])
 
@@ -82,7 +82,11 @@ if "selected_team" not in st.session_state:
 if run_button:
     replay_id = get_replay_id(replay_url)
 
-    print("Replay ID: ",replay_id)
+    print("Replay ID: ", replay_id)
+
+    if not replay_id:
+        st.error("Enter a Replay.")
+        st.stop()
 
     replay_response = requests.get(f"https://ballchasing.com/api/replays/{replay_id}",headers=headers, timeout=15)
 
@@ -124,9 +128,14 @@ if data:
         player_stats = flatten_stats(player.get("stats", {}))
 
         input_row = {}
+        missing_features = []
 
         for feature in features:
-            input_row[feature] = player_stats.get(feature, 0)
+            if feature in player_stats:
+                input_row[feature] = player_stats[feature]
+            else:
+                input_row[feature] = 0
+                missing_features.append(feature)
 
         input_df = pd.DataFrame([input_row])
 
@@ -146,5 +155,8 @@ if data:
 
             if rank_image and rank_image.exists():
                 st.image(str(rank_image), width="content")
+
+            if missing_features:
+                st.info(f"{len(missing_features)} stats were missing from this replay and defaulted to 0. This may affect prediction accuracy.")
 
   
