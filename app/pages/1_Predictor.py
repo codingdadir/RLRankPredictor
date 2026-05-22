@@ -84,9 +84,9 @@ if run_button:
 
     print("Replay ID: ", replay_id)
 
-    if not replay_id:
-        st.error("Enter a Replay.")
-        st.stop()
+    # if not replay_id:
+    #     st.error("Enter a Replay.")
+    #     st.stop()
 
     replay_response = requests.get(f"https://ballchasing.com/api/replays/{replay_id}",headers=headers, timeout=15)
 
